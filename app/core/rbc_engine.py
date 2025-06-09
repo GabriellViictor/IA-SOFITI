@@ -16,7 +16,7 @@ class AtendimentoRecommender:
             raise ValueError("Campos obrigatórios 'tipogui', 'codcon' e 'codmed' não podem estar vazios.")
 
         query = queries.query_local(tipo_gui, cod_con, cod_med, meses=6)
-        df = self.db.load_dataframeTeste(query)
+        df = self.db.load_dataframe(query)
 
         if df.empty:
             return []
@@ -47,7 +47,7 @@ class AtendimentoRecommender:
             raise ValueError("Campos obrigatórios 'tipogui', 'codcon', 'codloc' e 'codmed' não podem estar vazios.")
 
         query = queries.query_acomodacao(tipo_gui, cod_con, cod_loc, cod_med)
-        df = self.db.load_dataframeTeste(query)
+        df = self.db.load_dataframe(query)
 
         if df.empty:
             return []
@@ -78,45 +78,55 @@ class AtendimentoRecommender:
         if not tipo_gui or not cod_con or not cod_loc or not acomodacao or not cod_med:
             raise ValueError("Campos obrigatórios 'tipogui', 'codcon', 'codloc', 'acomoda' e 'codmed' não podem estar vazios.")
 
+        # Recomendação geral (histórico completo)
         query_all = queries.query_procedimentos(tipo_gui, cod_con, cod_loc, acomodacao, cod_med, last_6_months=False)
-        df_all = self.db.load_dataframeTeste(query_all)
+        df_all = self.db.load_dataframe(query_all)
 
-        if df_all.empty:
-            return []
+        if not df_all.empty:
+            encoder_all, index_all, y_all = train_model(df_all, ["tipogui", "codcon", "codloc", "acomoda", "codmed"], "codpro")
+            input_df = pd.DataFrame([{
+                "tipogui": tipo_gui,
+                "codcon": cod_con,
+                "codloc": cod_loc,
+                "acomoda": acomodacao,
+                "codmed": cod_med
+            }])
+            input_encoded = encoder_all.transform(input_df).toarray().astype(np.float32)
+            input_encoded = normalize(input_encoded, axis=1)
+            distances_all, indices_all = index_all.search(input_encoded, top_n)
+            top_series_all = y_all.iloc[indices_all[0]].value_counts()
+            recomendacoes_geral = [
+                {"code": str(code), "description": ""}
+                for code in top_series_all.index[:5]
+            ] if not top_series_all.empty else []
+        else:
+            recomendacoes_geral = []
 
-        encoder_all, index_all, y_all = train_model(df_all, ["tipogui", "codcon", "codloc", "acomoda", "codmed"], "codpro")
-
-        input_df = pd.DataFrame([{
-            "tipogui": tipo_gui,
-            "codcon": cod_con,
-            "codloc": cod_loc,
-            "acomoda": acomodacao,
-            "codmed": cod_med
-        }])
-
-        input_encoded = encoder_all.transform(input_df).toarray().astype(np.float32)
-        input_encoded = normalize(input_encoded, axis=1)
-
-        distances_all, indices_all = index_all.search(input_encoded, top_n)
-        top_series_all = y_all.iloc[indices_all[0]].value_counts()
-
+        # Recomendação dos últimos 6 meses
         query_6mo = queries.query_procedimentos(tipo_gui, cod_con, cod_loc, acomodacao, cod_med, last_6_months=True)
-        df_6mo = self.db.load_dataframeTeste(query_6mo)
+        df_6mo = self.db.load_dataframe(query_6mo)
 
         if not df_6mo.empty:
             encoder_6mo, index_6mo, y_6mo = train_model(df_6mo, ["tipogui", "codcon", "codloc", "acomoda", "codmed"], "codpro")
+            input_df = pd.DataFrame([{
+                "tipogui": tipo_gui,
+                "codcon": cod_con,
+                "codloc": cod_loc,
+                "acomoda": acomodacao,
+                "codmed": cod_med
+            }])
             input_encoded_6mo = encoder_6mo.transform(input_df).toarray().astype(np.float32)
             input_encoded_6mo = normalize(input_encoded_6mo, axis=1)
-
             distances_6mo, indices_6mo = index_6mo.search(input_encoded_6mo, top_n)
             top_series_6mo = y_6mo.iloc[indices_6mo[0]].value_counts()
-            recomendacoes_6mo = top_series_6mo.index[:5].tolist() if not top_series_6mo.empty else []
+            recomendacoes_6_meses = [
+                {"code": str(code), "description": ""}
+                for code in top_series_6mo.index[:5]
+            ] if not top_series_6mo.empty else []
         else:
-            recomendacoes_6mo = []
+            recomendacoes_6_meses = []
 
-        recomendacoes = [
-            {"code": str(code), "description": ""}
-            for code in top_series_all.index[:5]
-        ] if not top_series_all.empty else []
-
-        return recomendacoes
+        return {
+            "recomendacoes_geral": recomendacoes_geral,
+            "recomendacoes_6_meses": recomendacoes_6_meses
+        }

@@ -1,31 +1,29 @@
 import pandas as pd
 import psycopg2
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
+import os
+
+load_dotenv() 
+
 
 class DatabaseConnection:
     def __init__(self):
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+        db_name = os.getenv("DB_NAME")
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        db_test_name = os.getenv("DB_TEST_NAME")
         
         self.conn = psycopg2.connect(
-            host="192.168.180.44",
-            port="5434",
-            database="dados_importados",
-            user="postgres",
-            password="1234"
+            host=db_host,
+            port=db_port,
+            database=db_name,
+            user=db_user,
+            password=db_password
         )
-        self.engine = create_engine("postgresql+psycopg2://postgres:1234@192.168.180.44:5434/dados_importados")
-
-        self.conn = psycopg2.connect(
-            host="192.168.180.44",
-            port="5434",
-            database="postgres",
-            user="postgres",
-            password="1234"
-        )
-        self.engineTst = create_engine("postgresql+psycopg2://postgres:1234@192.168.180.44:5434/postgres")
-
+        self.engineTst = create_engine(f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_test_name}")
 
     def load_dataframe(self, query):
-        return pd.read_sql(query, self.engine).dropna()
-
-    def load_dataframeTeste(self, query):
         return pd.read_sql(query, self.engineTst).dropna()

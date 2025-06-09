@@ -42,3 +42,7 @@ class AutoOutput(BaseModel):
 class RecomendacaoItem(BaseModel):
     code: str
     description: str
+
+class RecomendacaoProcedimentoResponse(BaseModel):
+    recomendacoes_geral: List[RecomendacaoItem]
+    recomendacoes_6_meses: List[RecomendacaoItem]

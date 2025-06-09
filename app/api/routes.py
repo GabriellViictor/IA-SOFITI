@@ -5,7 +5,8 @@ from app.schemas.schemas import (
     LocalInput,
     AcomodacaoInput,
     ProcedimentoInput,
-    RecomendacaoItem
+    RecomendacaoItem,
+    RecomendacaoProcedimentoResponse
 )
 
 router = APIRouter()
@@ -52,7 +53,7 @@ async def recommend_acomoda(data: AcomodacaoInput):
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
 
-@router.post("/recommend/procedimentos", response_model=List[RecomendacaoItem])
+@router.post("/recommend/procedimentos", response_model=RecomendacaoProcedimentoResponse)
 async def recommend_procedimentos(data: ProcedimentoInput):
     validar_campos_obrigatorios({
         "tipogui": data.tipogui,
@@ -65,7 +66,7 @@ async def recommend_procedimentos(data: ProcedimentoInput):
         recs = atendimento_recommender.recommend_proced(
             data.tipogui, data.codcon, data.codloc, data.acomoda, data.codmed, top_n=10000
         )
-        if not recs:
+        if not recs or (not recs["recomendacoes_geral"] and not recs["recomendacoes_6_meses"]):
             raise HTTPException(status_code=204, detail="Nenhuma recomendação encontrada.")
         return recs
     except ValueError as ve:
