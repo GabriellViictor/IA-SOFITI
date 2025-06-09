@@ -1,10 +1,10 @@
-# RBC - Sistema de Recomendação Baseada em Casos
+# 🧠 RBC - Sistema de Recomendação Baseada em Casos
 
-Este projeto é uma API para recomendação de locais, acomodações e procedimentos médicos baseada em dados históricos, construída com FastAPI e machine learning.
+Este projeto é uma API para recomendação de locais, acomodações e procedimentos médicos, baseada em dados históricos, construída com **FastAPI** e **Machine Learning**.
 
 ---
 
-## Sumário
+## 📚 Sumário
 
 - [Pré-requisitos](#pré-requisitos)
 - [Configuração do Ambiente](#configuração-do-ambiente)
@@ -20,7 +20,7 @@ Este projeto é uma API para recomendação de locais, acomodações e procedime
 
 ---
 
-## Pré-requisitos
+## ✅ Pré-requisitos
 
 - Python 3.10+
 - PostgreSQL com os dados necessários
@@ -28,128 +28,166 @@ Este projeto é uma API para recomendação de locais, acomodações e procedime
 
 ---
 
-## Configuração do Ambiente
-**Configure o arquivo `.env`:**
-   Crie um arquivo `.env` na raiz do projeto com as informações do seu banco de dados:
-   ```
-   DB_HOST=seu_host
-   DB_PORT=sua_porta
-   DB_NAME=nome_do_banco
-   DB_USER=usuario
-   DB_PASSWORD=senha
-   DB_TEST_NAME=nome_do_banco_teste
-   ```
+## ⚙️ Configuração do Ambiente
+
+Crie um arquivo `.env` na raiz do projeto com as seguintes informações:
+
+```env
+DB_HOST=seu_host
+DB_PORT=sua_porta
+DB_NAME=nome_do_banco
+DB_USER=usuario
+DB_PASSWORD=senha
+DB_TEST_NAME=nome_do_banco_teste
+```
 
 ---
 
-## Rodando o Projeto
+## 🚀 Rodando o Projeto
 
-### Com Docker (Recomendado)
+### 🐳 Com Docker (Recomendado)
 
 1. **Build da imagem:**
-   ```sh
-   docker build -t rbc-app ./app
-   ```
+
+```sh
+docker build -t rbc-app ./app
+```
 
 2. **Execute o container:**
-   ```sh
-   docker run --env-file .env -p 8000:8000 rbc-app
-   ```
+
+```sh
+docker run --env-file .env -p 8000:8000 rbc-app
+```
 
 3. **Acesse a API:**
-   - [http://localhost:8000/docs](http://localhost:8000/docs) (Swagger UI)
-   - [http://localhost:8000/health](http://localhost:8000/health)
 
-### Sem Docker (Ambiente Local)
+- http://localhost:8000/docs (Swagger UI)
+- http://localhost:8000/health
 
-1. **Crie um ambiente virtual e ative:**
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   venv\Scripts\activate     # Windows
-   ```
+---
+
+### 💻 Sem Docker (Ambiente Local)
+
+1. **Crie e ative um ambiente virtual:**
+
+```sh
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
 
 2. **Instale as dependências:**
-   ```sh
-   pip install -r requirements.txt
-   ```
+
+```sh
+pip install -r requirements.txt
+```
 
 3. **Execute a aplicação:**
-   ```sh
-   uvicorn app.main:app --reload        
-   ```
+
+```sh
+uvicorn app.main:app --reload
+```
 
 ---
 
-## Configuração do Banco de Dados
+## 🛢️ Configuração do Banco de Dados
 
-- Certifique-se de que o banco PostgreSQL está acessível e populado com as tabelas e dados necessários.
-- Os parâmetros de conexão são definidos no arquivo `.env`.
+- Certifique-se de que o PostgreSQL está acessível e populado com as tabelas e dados necessários.
+- Os parâmetros de conexão estão definidos no arquivo `.env`.
 
 ---
 
-## Utilizando a API
+## 📡 Utilizando a API
 
 ### Endpoints
 
-- **GET `/health`**  
-  Verifica se a API está online.
+#### 🔍 GET `/health`
+Verifica se a API está online.
 
-- **POST `/recommend/local`**  
-  Recomendação de locais.
-  - **Body:**  
-    ```json
-    {
-      "tipogui": "string",
-      "codcon": "string",
-      "codmed": "string"
-    }
-    ```
-  - **Resposta:**  
-    Lista de objetos com `code` e `description`.
-
-- **POST `/recommend/acomodacao`**  
-  Recomendação de acomodações.
-  - **Body:**  
-    ```json
-    {
-      "tipogui": "string",
-      "codcon": "string",
-      "codloc": "string",
-      "codmed": "string"
-    }
-    ```
-  - **Resposta:**  
-    Lista de objetos com `code` e `description`.
-
-- **POST `/recommend/procedimentos`**  
-  Recomendação de procedimentos (histórico geral e últimos 6 meses).
-  - **Body:**  
-    ```json
-    {
-      "tipogui": "string",
-      "codcon": "string",
-      "codloc": "string",
-      "acomoda": "string",
-      "codmed": "string"
-    }
-    ```
-  - **Resposta:**  
-    ```json
-    {
-      "recomendacoes_geral": [
-        {"code": "40202038", "description": ""},
-        {"code": "40201082", "description": ""}
-      ],
-      "recomendacoes_6_meses": [
-        {"code": "31602231", "description": ""},
-        {"code": "40202550", "description": ""}
-      ]
-    }
-    ```
 ---
 
-## Estrutura do Projeto
+#### 📍 POST `/recommend/local`  
+**Recomendação de locais**
+
+**Body:**
+
+```json
+{
+  "tipogui": "string",
+  "codcon": "string",
+  "codmed": "string"
+}
+```
+
+**Resposta:**
+
+```json
+[
+  { "code": "001", "description": "Hospital A" },
+  { "code": "002", "description": "Hospital B" }
+]
+```
+
+---
+
+#### 🏨 POST `/recommend/acomodacao`  
+**Recomendação de acomodações**
+
+**Body:**
+
+```json
+{
+  "tipogui": "string",
+  "codcon": "string",
+  "codloc": "string",
+  "codmed": "string"
+}
+```
+
+**Resposta:**
+
+```json
+[
+  { "code": "01", "description": "Apartamento" },
+  { "code": "02", "description": "Enfermaria" }
+]
+```
+
+---
+
+#### 🩺 POST `/recommend/procedimentos`  
+**Recomendação de procedimentos (geral e últimos 6 meses)**
+
+**Body:**
+
+```json
+{
+  "tipogui": "string",
+  "codcon": "string",
+  "codloc": "string",
+  "acomoda": "string",
+  "codmed": "string"
+}
+```
+
+**Resposta:**
+
+```json
+{
+  "recomendacoes_geral": [
+    { "code": "40202038", "description": "" },
+    { "code": "40201082", "description": "" }
+  ],
+  "recomendacoes_6_meses": [
+    { "code": "31602231", "description": "" },
+    { "code": "40202550", "description": "" }
+  ]
+}
+```
+
+---
+
+## 🗂️ Estrutura do Projeto
 
 ```
 RBC/
@@ -166,3 +204,11 @@ RBC/
 ├── .env
 └── .gitignore
 ```
+
+---
+
+## 💡 Observações e Dicas
+
+- Certifique-se de que a base de dados possui os dados esperados para obter recomendações relevantes.
+- Use o Swagger UI para testar os endpoints de forma prática e interativa.
+- Para testes automatizados, considere configurar um banco de dados separado (usando `DB_TEST_NAME`).
