@@ -1,6 +1,7 @@
 # RBC - Sistema de Recomendação Baseada em Casos
 
 Este projeto é uma API para recomendação de locais, acomodações e procedimentos médicos baseada em dados históricos, construída com FastAPI e machine learning.
+
 ---
 
 ## Sumário
