@@ -29,14 +29,7 @@ Este projeto é uma API para recomendação de locais, acomodações e procedime
 ---
 
 ## Configuração do Ambiente
-
-1. **Clone o repositório:**
-   ```sh
-   git clone <url-do-repositorio>
-   cd RBC
-   ```
-
-2. **Configure o arquivo `.env`:**
+**Configure o arquivo `.env`:**
    Crie um arquivo `.env` na raiz do projeto com as informações do seu banco de dados:
    ```
    DB_HOST=seu_host
@@ -83,7 +76,7 @@ Este projeto é uma API para recomendação de locais, acomodações e procedime
 
 3. **Execute a aplicação:**
    ```sh
-   uvicorn app.main:app --host 0.0.0.0 --port 8000
+   uvicorn app.main:app --reload        
    ```
 
 ---
@@ -154,36 +147,6 @@ Este projeto é uma API para recomendação de locais, acomodações e procedime
       ]
     }
     ```
-
-### Exemplo de Uso
-
-**Requisição:**
-```sh
-curl -X POST "http://localhost:8000/recommend/procedimentos" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "tipogui": "1",
-    "codcon": "123",
-    "codloc": "456",
-    "acomoda": "A",
-    "codmed": "789"
-  }'
-```
-
-**Resposta:**
-```json
-{
-  "recomendacoes_geral": [
-    {"code": "40202038", "description": ""},
-    {"code": "40201082", "description": ""}
-  ],
-  "recomendacoes_6_meses": [
-    {"code": "31602231", "description": ""},
-    {"code": "40202550", "description": ""}
-  ]
-}
-```
-
 ---
 
 ## Estrutura do Projeto
@@ -203,16 +166,3 @@ RBC/
 ├── .env
 └── .gitignore
 ```
-
----
-
-## Observações e Dicas
-
-- Utilize o Swagger UI em `/docs` para testar a API de forma interativa.
-- O arquivo `.env` **não deve ser versionado** (já está no `.gitignore`).
-- Para produção, configure variáveis de ambiente seguras e utilize HTTPS.
-- Consulte os logs para depuração de erros.
-
----
-
-**Dúvidas ou sugestões? Abra uma issue ou entre em contato!**
